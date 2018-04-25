@@ -1,5 +1,8 @@
 # because testing
-mock
+mock==2.0.0
 
 # because pass-through
-sh
+sh==1.12.14
+
+# to assist with Python2/3 compatibility
+future==0.16.0

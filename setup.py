@@ -17,13 +17,14 @@ if sys.argv[-1] == 'publish':
 # There's some intersection with requirements.txt but pypi can't handle git
 # dependencies. So it's better to just manually list dependencies again.
 requires = [
-    "mock",
-    "sh",
+    'mock==2.0.0',
+    'sh==1.12.14',
+    'future==0.16.0',
 ]
 
 setup(
     name="wmi-client-wrapper",
-    version="0.0.12",
+    version="0.0.13",
     description="Linux-only wrapper around wmi-client for WMI (Windows)",
     long_description=open("README.md", "r").read(),
     license="BSD",

@@ -4,10 +4,24 @@ Houses the wrapper for wmi-client.
 There are a handful of injection vulnerabilities in this, so don't expose it
 directly to end-users.
 """
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
 import csv
+from builtins import object, str
+from io import StringIO
+from sys import version_info
+
 import sh
-from StringIO import StringIO
+from future import standard_library
+
+standard_library.install_aliases()
+
+
+# because standard_library.install_aliases() replaces str with newstr which upsets csv module
+if version_info[0] < 3:
+    from past.types.oldstr import oldstr as str
+
 
 class WmiClientWrapper(object):
     """
@@ -22,7 +36,7 @@ class WmiClientWrapper(object):
     def __init__(self, username="Administrator", password=None, host=None, namespace='//./root/cimv2', delimiter="\01"):
         assert username
         assert password
-        assert host # assume host is up
+        assert host  # assume host is up
 
         # store the credentials for later
         self.username = username
@@ -31,7 +45,7 @@ class WmiClientWrapper(object):
 
         self.delimiter = delimiter
         self.namespace = namespace
-        
+
     def _make_credential_args(self):
         """
         Makes credentials that get passed to wmic. This assembles a list of
@@ -53,8 +67,8 @@ class WmiClientWrapper(object):
 
         arguments.append(hostaddr)
         # the format for namespace
-        space= "--namespace={namespace}".format(namespace=self.namespace)
-        
+        space = "--namespace={namespace}".format(namespace=self.namespace)
+
         arguments.append(space)
         return arguments
 
@@ -139,7 +153,7 @@ class WmiClientWrapper(object):
 
             strio = StringIO(section)
 
-            moredata = list(csv.DictReader(strio, delimiter=delimiter))
+            moredata = list(csv.DictReader(strio, delimiter=str(delimiter)))
             items.extend(moredata)
 
         # walk the dictionaries!
@@ -171,7 +185,7 @@ class WmiClientWrapper(object):
         elif isinstance(incoming, dict):
             output = dict()
 
-            for (key, value) in incoming.items():
+            for (key, value) in list(incoming.items()):
                 if value == "(null)":
                     output[key] = None
                 elif value == "True":

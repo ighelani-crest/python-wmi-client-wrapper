@@ -13,9 +13,9 @@ pip install wmi-client-wrapper
 ## usage
 
 ```
-import wmi_client_wrapper as wmi
+from wmi_client_wrapper import WmiClientWrapper
 
-wmic = wmi.WmiClientWrapper(
+wmic = WmiClientWrapper(
     username="Administrator",
     password="password",
     host="192.168.1.149",
@@ -23,7 +23,7 @@ wmic = wmi.WmiClientWrapper(
 
 output = wmic.query("SELECT * FROM Win32_Processor")
 
-#get FibrePort Info
+# get FibrePort Info
 wmic = wmi.WmiClientWrapper(
     username="Administrator",
     password="password",

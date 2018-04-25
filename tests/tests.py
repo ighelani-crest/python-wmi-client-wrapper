@@ -1,11 +1,19 @@
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
+import os
 import unittest
+
 import mock
+from future import standard_library
 
 import wmi_client_wrapper as wmi
 
-import os
+standard_library.install_aliases()
+
 
 datapath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/")
+
 
 class TestCases(unittest.TestCase):
     def test_object_creation_raises_without_username(self):
@@ -81,6 +89,7 @@ class TestCases(unittest.TestCase):
 
             self.assertNotIn({"AcceptPause": "CLASS: Win32_Service"}, result)
 
+
 class DictionaryWalkingTestCases(unittest.TestCase):
     def test_basic_dictionary_output(self):
         incoming = {}
@@ -147,6 +156,7 @@ class DictionaryWalkingTestCases(unittest.TestCase):
         self.assertIn("beep", output[0])
         self.assertEqual(output[0]["beep"], None)
 
+
 class MoreTestCases(unittest.TestCase):
     def setUp(self):
         self.wmic = wmi.WmiClientWrapper(
@@ -162,12 +172,13 @@ class MoreTestCases(unittest.TestCase):
         args = self.wmic._make_credential_args()
 
     @mock.patch("wmi_client_wrapper.wrapper.WmiClientWrapper._parse_wmic_output")
-    @mock.patch("wmi_client_wrapper.wrapper.sh.wmic")
-    def test_query_calls(self, mock_sh_wmic, mock_parser):
+    @mock.patch("wmi_client_wrapper.wrapper.sh")
+    def test_query_calls(self, mock_sh, mock_parser):
         self.wmic.query("")
 
-        self.assertTrue(mock_sh_wmic.called)
+        self.assertTrue(mock_sh.wmic.called)
         self.assertTrue(mock_parser.called)
+
 
 if __name__ == "__main__":
     unittest.main()
