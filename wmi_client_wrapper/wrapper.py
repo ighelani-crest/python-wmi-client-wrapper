@@ -11,16 +11,15 @@ import csv
 from builtins import *
 from builtins import object, str
 from io import StringIO
-from sys import version as python_version
+import sys
 
 import sh
 
 from future import standard_library
 
 standard_library.install_aliases()
-version = tuple([int(x) for x in python_version.strip().split()[0].split('.')])
 
-if version < (3, 0, 0):
+if int(sys.version_info[0]) < 3:
     from past.types.oldstr import oldstr as str
 
 
@@ -34,7 +33,14 @@ class WmiClientWrapper(object):
     it directly to end-users.
     """
 
-    def __init__(self, username="Administrator", password=None, host=None, namespace='//./root/cimv2', delimiter="\01"):
+    def __init__(self,
+            username="Administrator",
+            password=None,
+            host=None,
+            namespace='//./root/cimv2',
+            delimiter="\01",
+            force_ntlm_v2=False):
+
         assert username
         assert password
         assert host  # assume host is up
@@ -43,6 +49,7 @@ class WmiClientWrapper(object):
         self.username = username
         self.password = password
         self.host = host
+        self.force_ntlm_v2 = force_ntlm_v2
 
         self.delimiter = delimiter
         self.namespace = namespace
@@ -77,7 +84,15 @@ class WmiClientWrapper(object):
         """
         Makes extra configuration that gets passed to wmic.
         """
-        return ["--delimiter={delimiter}".format(delimiter=self.delimiter)]
+
+        params = []
+
+        if (self.force_ntlm_v2):
+            params.append('--option=client ntlmv2 auth=Yes')
+
+        params.append("--delimiter={delimiter}".format(delimiter=self.delimiter))
+
+        return params
 
     def _construct_query(self, klass):
         """
